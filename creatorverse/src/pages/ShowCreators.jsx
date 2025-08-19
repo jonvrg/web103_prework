@@ -3,8 +3,21 @@ import CreatorCard from "../components/CreatorCard";
 import "./ShowCreators.css";
 
 const ShowCreators = ({ creators, loading, err }) => {
-  if (loading) return <div className="page"><p>Loading…</p></div>;
-  if (err) return <div className="page"><p className="error">Error: {err}</p></div>;
+  if (loading) {
+    return (
+      <div className="page">
+        <p>Loading…</p>
+      </div>
+    );
+  }
+
+  if (err) {
+    return (
+      <div className="page">
+        <p className="error">Error: {err}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
@@ -17,7 +30,9 @@ const ShowCreators = ({ creators, loading, err }) => {
         <p className="empty">No content creators yet. Add one to get started!</p>
       ) : (
         <div className="creator-grid">
-          {creators.map(c => <CreatorCard key={c.id} creator={c} />)}
+          {creators.map((c) => (
+            <CreatorCard key={c.id} creator={c} />
+          ))}
         </div>
       )}
     </div>
