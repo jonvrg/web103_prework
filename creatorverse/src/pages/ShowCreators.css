@@ -1,0 +1,22 @@
+.page {
+    display: grid;
+    gap: 16px;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .creator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  
+  .empty {
+    color: #6b7280;
+    padding: 12px 0;
+  }
+  

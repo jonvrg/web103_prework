@@ -1,35 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import { Link, useRoutes } from "react-router-dom";
+import { supabase } from "./client";
+import ShowCreators from "./pages/ShowCreators";
+import ViewCreator from "./pages/ViewCreator";
+import AddCreator from "./pages/AddCreator";
+import EditCreator from "./pages/EditCreator";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [creators, setCreators] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
+
+  useEffect(() => {
+    async function fetchCreators() {
+      try {
+        const { data, error } = await supabase
+          .from("creators")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        setCreators(data ?? []);
+      } catch (e) {
+        setErr(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCreators();
+  }, []);
+
+  const element = useRoutes([
+    { path: "/", element: <ShowCreators creators={creators} loading={loading} err={err} /> },
+    { path: "/creators/new", element: <AddCreator /> },
+    { path: "/creators/:id", element: <ViewCreator /> },
+    { path: "/creators/:id/edit", element: <EditCreator /> },
+  ]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="container">
+      <header className="app-header">
+        <Link to="/" className="brand">Creatorverse</Link>
+        <nav>
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/creators/new" className="nav-link">Add Creator</Link>
+        </nav>
+      </header>
+      <main>{element}</main>
+    </div>
+  );
+};
 
-export default App
+export default App;
