@@ -77,3 +77,9 @@ main {
 .error {
   color: crimson;
 }
+
+.btn.danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}

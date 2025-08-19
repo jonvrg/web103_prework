@@ -31,6 +31,7 @@ const EditCreator = () => {
         .select("*")
         .eq("id", numericId)
         .single();
+
       if (error) setErr(error.message);
       else if (data) {
         setForm({
@@ -72,6 +73,22 @@ const EditCreator = () => {
       return;
     }
     navigate(`/creators/${id}`);
+  };
+
+  const onDelete = async () => {
+    if (!confirm("Delete this creator?")) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("creators")
+      .delete()
+      .eq("id", Number(id));
+
+    if (error) {
+      setErr(error.message);
+      setSaving(false);
+      return;
+    }
+    navigate("/");
   };
 
   if (loading) {
@@ -132,6 +149,14 @@ const EditCreator = () => {
         <div className="actions">
           <button className="btn primary" type="submit" disabled={saving}>
             {saving ? "Saving…" : "Save Changes"}
+          </button>
+          <button
+            type="button"
+            className="btn danger"
+            onClick={onDelete}
+            disabled={saving}
+          >
+            {saving ? "Deleting…" : "Delete"}
           </button>
           <Link className="btn" to={`/creators/${id}`}>
             Cancel
