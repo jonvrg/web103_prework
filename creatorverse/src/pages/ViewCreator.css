@@ -5,14 +5,13 @@
     gap: 16px;
   }
   
-  .hero {
-    display: grid;
-    gap: 12px;
+  .view-creator .title {
+    margin: 0;
   }
   
   .hero-image {
     width: 100%;
-    max-height: 360px;
+    max-height: 380px;
     object-fit: cover;
     border-radius: 8px;
     background: #f3f4f6;
@@ -20,11 +19,15 @@
   
   .meta {
     color: #4b5563;
-    line-height: 1.5;
+    line-height: 1.6;
   }
   
   .actions {
     display: flex;
     gap: 10px;
+  }
+  
+  .empty {
+    color: #6b7280;
   }
   
