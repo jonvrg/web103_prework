@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { supabase } from "../client";
+import axios from "axios";
 import "./ViewCreator.css";
+
+const API_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/creators`;
+const API_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
 const ViewCreator = () => {
   const { id } = useParams();
@@ -21,16 +24,26 @@ const ViewCreator = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from("creators")
-          .select("*")
-          .eq("id", numericId)
-          .single();
+        const res = await axios.get(API_URL, {
+          headers: {
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
+          },
+          params: {
+            select: "*",
+            id: `eq.${numericId}`,
+            limit: 1,
+          },
+        });
 
-        if (error) setErr(error.message);
-        else if (mounted) setCreator(data);
+        const row = Array.isArray(res.data) ? res.data[0] : null;
+        if (!mounted) return;
+
+        if (!row) setErr("Creator not found");
+        else setCreator(row);
       } catch (e) {
-        setErr(String(e));
+        if (!mounted) return;
+        setErr(e?.response?.data?.message || e.message || String(e));
       } finally {
         if (mounted) setLoading(false);
       }

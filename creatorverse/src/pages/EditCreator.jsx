@@ -1,94 +1,130 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { supabase } from "../client";
+import axios from "axios";
 import "./EditCreator.css";
 
-const EditCreator = () => {
+const API_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/creators`;
+const API_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+const EditCreator = ({ onChanged }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    name: "",
-    url: "",
-    description: "",
-    imageURL: "",
-  });
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageURL, setImageURL] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState(null);
 
+  // Load existing creator
   useEffect(() => {
-    (async () => {
-      const numericId = Number(id);
-      if (Number.isNaN(numericId)) {
-        setErr("Invalid creator id");
-        setLoading(false);
-        return;
-      }
-      const { data, error } = await supabase
-        .from("creators")
-        .select("*")
-        .eq("id", numericId)
-        .single();
+    let mounted = true;
 
-      if (error) setErr(error.message);
-      else if (data) {
-        setForm({
-          name: data.name || "",
-          url: data.url || "",
-          description: data.description || "",
-          imageURL: data.imageURL || "",
+    (async () => {
+      try {
+        const numericId = Number(id);
+        if (Number.isNaN(numericId)) throw new Error("Invalid creator id");
+
+        const res = await axios.get(API_URL, {
+          headers: {
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
+          },
+          params: {
+            select: "*",
+            id: `eq.${numericId}`,
+            limit: 1,
+          },
         });
+
+        if (!mounted) return;
+
+        const row = Array.isArray(res.data) ? res.data[0] : null;
+        if (!row) throw new Error("Creator not found");
+
+        setName(row.name || "");
+        setUrl(row.url || "");
+        setDescription(row.description || "");
+        setImageURL(row.imageURL || "");
+        setErr(null);
+      } catch (e) {
+        setErr(e?.response?.data?.message || e.message || String(e));
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
     })();
+
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-
-  const onSubmit = async (e) => {
+  // Update
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErr(null);
-    if (!form.name.trim()) {
+
+    if (!name.trim()) {
       setErr("Name is required.");
       return;
     }
+
     setSaving(true);
+    try {
+      await axios.patch(
+        API_URL,
+        {
+          name,
+          url,
+          description,
+          imageURL: imageURL || null,
+        },
+        {
+          headers: {
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          params: {
+            id: `eq.${Number(id)}`,
+          },
+        }
+      );
 
-    const payload = { ...form };
-    if (!payload.imageURL) delete payload.imageURL;
-
-    const { error } = await supabase
-      .from("creators")
-      .update(payload)
-      .eq("id", Number(id));
-
-    if (error) {
-      setErr(error.message);
+      if (onChanged) await onChanged(); // refresh home list if App passed this
+      navigate(`/creators/${id}`);
+    } catch (e) {
+      setErr(e?.response?.data?.message || e.message || String(e));
+    } finally {
       setSaving(false);
-      return;
     }
-    navigate(`/creators/${id}`);
   };
 
-  const onDelete = async () => {
+  // Delete
+  const handleDelete = async () => {
     if (!confirm("Delete this creator?")) return;
     setSaving(true);
-    const { error } = await supabase
-      .from("creators")
-      .delete()
-      .eq("id", Number(id));
-
-    if (error) {
-      setErr(error.message);
+    setErr(null);
+    try {
+      await axios.delete(API_URL, {
+        headers: {
+          apikey: API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        params: {
+          id: `eq.${Number(id)}`,
+        },
+      });
+      if (onChanged) await onChanged();
+      navigate("/");
+    } catch (e) {
+      setErr(e?.response?.data?.message || e.message || String(e));
       setSaving(false);
-      return;
     }
-    navigate("/");
   };
 
   if (loading) {
@@ -102,47 +138,48 @@ const EditCreator = () => {
   return (
     <div className="page">
       <h2>Edit Creator</h2>
+
       {err && <p className="error">Error: {err}</p>}
 
-      <form className="form" onSubmit={onSubmit}>
+      <form className="form" onSubmit={handleSubmit}>
         <label>
           Name
           <input
-            name="name"
-            value={form.name}
-            onChange={onChange}
+            type="text"
             placeholder="Creator name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
           />
         </label>
 
         <label>
           Channel/Page URL
           <input
-            name="url"
-            value={form.url}
-            onChange={onChange}
+            type="url"
             placeholder="https://…"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
           />
         </label>
 
         <label>
           Image URL (optional)
           <input
-            name="imageURL"
-            value={form.imageURL}
-            onChange={onChange}
+            type="url"
             placeholder="https://…"
+            value={imageURL}
+            onChange={(e) => setImageURL(e.target.value)}
           />
         </label>
 
         <label>
           Description
           <textarea
-            name="description"
-            value={form.description}
-            onChange={onChange}
             rows={5}
             placeholder="What is this creator about?"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </label>
 
@@ -153,7 +190,7 @@ const EditCreator = () => {
           <button
             type="button"
             className="btn danger"
-            onClick={onDelete}
+            onClick={handleDelete}
             disabled={saving}
           >
             {saving ? "Deleting…" : "Delete"}

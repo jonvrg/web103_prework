@@ -1,111 +1,71 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../client";
+import axios from "axios";
 import "./AddCreator.css";
 
-const AddCreator = () => {
-  const [form, setForm] = useState({
-    name: "",
-    url: "",
-    description: "",
-    imageURL: "",
-  });
-  const [saving, setSaving] = useState(false);
+const API_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/creators`;
+const API_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+const AddCreator = ({ onChanged }) => {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageURL, setImageURL] = useState("");
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
-  const navigate = useNavigate();
-
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErr(null);
-    if (!form.name.trim()) {
-      setErr("Name is required.");
+    if (!name.trim() || !url.trim() || !description.trim()) {
+      setErr("Please fill in name, URL, and description.");
       return;
     }
-
-    setSaving(true);
-
-    // imageURL is optional
-    const payload = { ...form };
-    if (!payload.imageURL) {
-      delete payload.imageURL;
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        API_URL,
+        { name, url, description, imageURL: imageURL || null },
+        {
+          headers: {
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+        }
+      );
+      // refresh list then go home (or to details if you prefer)
+      if (onChanged) await onChanged();
+      navigate("/");
+    } catch (e) {
+      setErr(e?.response?.data?.message || e.message || String(e));
+    } finally {
+      setLoading(false);
     }
-
-    const { data, error } = await supabase
-      .from("creators")
-      .insert([payload])
-      .select()
-      .single();
-
-    if (error) {
-      setErr(error.message);
-      setSaving(false);
-      return;
-    }
-
-    navigate(`/creators/${data.id}`);
   };
 
   return (
     <div className="page">
-      <h2>Add Creator</h2>
-
+      <h2>Add New Content Creator</h2>
       {err && <p className="error">Error: {err}</p>}
-
-      <form className="form" onSubmit={onSubmit}>
-        <label>
-          Name
-          <input
-            name="name"
-            value={form.name}
-            onChange={onChange}
-            placeholder="Creator name"
-          />
+      <form className="form" onSubmit={handleSubmit}>
+        <label> Name
+          <input type="text" value={name} onChange={(e)=>setName(e.target.value)} placeholder="Creator name" required />
         </label>
-
-        <label>
-          Channel/Page URL
-          <input
-            name="url"
-            value={form.url}
-            onChange={onChange}
-            placeholder="https://…"
-          />
+        <label> Channel/Page URL
+          <input type="url" value={url} onChange={(e)=>setUrl(e.target.value)} placeholder="https://…" required />
         </label>
-
-        <label>
-          Image URL (optional)
-          <input
-            name="imageURL"
-            value={form.imageURL}
-            onChange={onChange}
-            placeholder="https://…"
-          />
+        <label> Image URL (optional)
+          <input type="url" value={imageURL} onChange={(e)=>setImageURL(e.target.value)} placeholder="https://…" />
         </label>
-
-        <label>
-          Description
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={onChange}
-            rows={5}
-            placeholder="What is this creator about?"
-          />
+        <label> Description
+          <textarea rows={5} value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="What is this creator about?" required />
         </label>
-
         <div className="actions">
-          <button className="btn primary" type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save"}
-          </button>
-          <Link className="btn" to="/">
-            Cancel
-          </Link>
+          <button className="btn primary" type="submit" disabled={loading}>{loading ? "Adding…" : "Add Creator"}</button>
+          <Link className="btn" to="/">Cancel</Link>
         </div>
       </form>
     </div>
