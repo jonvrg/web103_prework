@@ -4,7 +4,7 @@ Submitted by: **Jonathan Vergonio**
 
 About this web app: **Provides information about Dance Creators on TikTok. This app connects to a database using Supabase and allows users to add, edit, delete, and view CreatorCards.**
 
-Time spent: **8** hours
+Time spent: **9** hours
 
 ## Required Features
 
@@ -38,16 +38,16 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented required features:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-
-GIF created with Kap
-<!--  [Kap](https://getkap.co/) for macOS -->
+![Walkthrough of Dance Studio Posts App](assets/dancecreatorsvisual.gif)
+GIF created with LiceCap
 
 ## Notes
 
 Handling API calls with `async/await` taught me more about proper error handling and loading states for a better user experience. 
 
 If there was more time, I would add a scroll left/right feature for a seamless user experience.
+
+Additionally, I would add more eccentric/personalized styling that matches the feel of the dance community.
 
 ## License
 
