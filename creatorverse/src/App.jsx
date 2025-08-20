@@ -45,7 +45,7 @@ const App = () => {
         <ul>
           <li>
             <Link to="/" className="contrast" style={{ textDecoration: "none" }}>
-              <strong>Creatorverse</strong>
+              <strong>Dance Creatorverse</strong>
             </Link>
           </li>
         </ul>

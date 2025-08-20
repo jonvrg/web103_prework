@@ -22,7 +22,7 @@ const CreatorCard = ({ creator }) => {
 
       <footer style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
         <Link to={`/creators/${id}`} role="button">
-          Bio 
+          Details
         </Link>
         {url && (
           <a href={url} target="_blank" rel="noreferrer" role="button" className="secondary">

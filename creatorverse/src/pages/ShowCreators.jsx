@@ -9,7 +9,7 @@ const ShowCreators = ({ creators, loading, err }) => {
   return (
     <section>
       <header className="grid" style={{ alignItems: "center" }}>
-        <h2>All Creators</h2>
+        <h2>All Dance Creators</h2>
         <div style={{ justifySelf: "end" }}>
           <Link to="/creators/new" role="button" className="contrast">
             + Add Creator
