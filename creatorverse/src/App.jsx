@@ -5,7 +5,6 @@ import ShowCreators from "./pages/ShowCreators";
 import ViewCreator from "./pages/ViewCreator";
 import AddCreator from "./pages/AddCreator";
 import EditCreator from "./pages/EditCreator";
-import "./App.css";
 
 const API_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/creators`;
 const API_KEY = import.meta.env.VITE_SUPABASE_KEY;
@@ -41,16 +40,25 @@ const App = () => {
   ]);
 
   return (
-    <div className="container">
-      <header className="app-header">
-        <Link to="/" className="brand">Creatorverse</Link>
-        <nav>
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/creators/new" className="nav-link">Add Creator</Link>
-        </nav>
-      </header>
-      <main>{element}</main>
-    </div>
+    <>
+      <nav className="container-fluid">
+        <ul>
+          <li>
+            <Link to="/" className="contrast" style={{ textDecoration: "none" }}>
+              <strong>Creatorverse</strong>
+            </Link>
+          </li>
+        </ul>
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/creators/new">Add Creator</Link></li>
+        </ul>
+      </nav>
+
+      <main className="container">
+        {element}
+      </main>
+    </>
   );
 };
 

@@ -1,10 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light"> <!-- try "dark" or "slate" too -->
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <title>Creatorverse</title>
+
+    <!-- Pico.css (CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css"
+    />
+
+    <!-- Optional: make containers wider than Pico’s default -->
+    <style>
+      :root {
+        --pico-container-max-width: 1280px;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

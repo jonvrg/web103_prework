@@ -3,39 +3,30 @@ import CreatorCard from "../components/CreatorCard";
 import "./ShowCreators.css";
 
 const ShowCreators = ({ creators, loading, err }) => {
-  if (loading) {
-    return (
-      <div className="page">
-        <p>Loading…</p>
-      </div>
-    );
-  }
-
-  if (err) {
-    return (
-      <div className="page">
-        <p className="error">Error: {err}</p>
-      </div>
-    );
-  }
+  if (loading) return <p>Loading…</p>;
+  if (err) return <p className="error">Error: {err}</p>;
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <section>
+      <header className="grid" style={{ alignItems: "center" }}>
         <h2>All Creators</h2>
-        <Link to="/creators/new" className="btn">+ Add Creator</Link>
-      </div>
+        <div style={{ justifySelf: "end" }}>
+          <Link to="/creators/new" role="button" className="contrast">
+            + Add Creator
+          </Link>
+        </div>
+      </header>
 
       {(!creators || creators.length === 0) ? (
-        <p className="empty">No content creators yet. Add one to get started!</p>
+        <p>No content creators yet. Add one to get started!</p>
       ) : (
-        <div className="creator-grid">
+        <div className="card-grid">
           {creators.map((c) => (
             <CreatorCard key={c.id} creator={c} />
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

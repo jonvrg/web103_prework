@@ -36,3 +36,19 @@
     gap: 10px;
   }
   
+  /* Delete button (danger style) */
+  .btn.danger {
+    background: #dc2626; /* red */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font: inherit;
+    transition: background 0.2s ease;
+  }
+  
+  .btn.danger:hover {
+    background: #b91c1c; /* darker red */
+  }
+  

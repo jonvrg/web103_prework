@@ -1,32 +1,39 @@
 import { Link } from "react-router-dom";
-import "./CreatorCard.css";
+import "./CreatorCard.css"; // only used for the image height
 
-/* Creator card shows the contents of the creator: Name, URL, Image, Description, etc.) */ 
 const CreatorCard = ({ creator }) => {
   const { id, name, url, description, imageURL } = creator;
 
   return (
-    <div className="creator-card">
+    <article>
       {imageURL && (
         <img
           src={imageURL}
-          alt={name}
+          alt={name ? `${name} image` : "Creator image"}
           className="creator-image"
         />
       )}
 
-      <h3 className="creator-title">{name}</h3>
-      <p className="creator-desc">{description}</p>
+      <header>
+        <h3 style={{ marginBottom: ".25rem" }}>{name}</h3>
+      </header>
 
-      <div className="creator-actions">
-        <Link to={`/creators/${id}`} className="btn">View</Link>
+      {description && <p>{description}</p>}
+
+      <footer style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
+        <Link to={`/creators/${id}`} role="button">
+          Bio 
+        </Link>
         {url && (
-          <a href={url} target="_blank" rel="noreferrer" className="btn">
-            Visit
+          <a href={url} target="_blank" rel="noreferrer" role="button" className="secondary">
+           TikTok
           </a>
         )}
-      </div>
-    </div>
+        <Link to={`/creators/${id}/edit`} role="button" className="secondary">
+          Edit
+        </Link>
+      </footer>
+    </article>
   );
 };
 
